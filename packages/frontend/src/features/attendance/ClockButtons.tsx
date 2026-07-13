@@ -4,6 +4,7 @@ import { LogIn, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatTime } from "./format";
+import { MemoDialog } from "./MemoDialog";
 import { useClockIn, useClockOut, useTodayStatus } from "./useAttendance";
 
 function CurrentTime() {
@@ -48,6 +49,7 @@ export function ClockButtons() {
   const { data: todayStatus, isLoading } = useTodayStatus();
   const clockInMutation = useClockIn();
   const clockOutMutation = useClockOut();
+  const [memoDialogType, setMemoDialogType] = useState<"clockIn" | "clockOut" | null>(null);
 
   if (isLoading) {
     return (
@@ -69,6 +71,15 @@ export function ClockButtons() {
 
   const lastRecord = todayStatus?.records[todayStatus.records.length - 1];
 
+  const handleMemoConfirm = (memo?: string) => {
+    if (memoDialogType === "clockIn") {
+      clockInMutation.mutate(memo);
+    } else if (memoDialogType === "clockOut") {
+      clockOutMutation.mutate(memo);
+    }
+    setMemoDialogType(null);
+  };
+
   return (
     <div className="rounded-lg border p-6 space-y-4">
       <CurrentTime />
@@ -84,7 +95,7 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockIn || isPending}
-          onClick={() => clockInMutation.mutate()}
+          onClick={() => setMemoDialogType("clockIn")}
           className="flex flex-col items-center justify-center gap-2 rounded-xl bg-green-500 py-8 text-white transition-colors hover:bg-green-600 active:bg-green-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogIn className="h-8 w-8" />
@@ -93,13 +104,19 @@ export function ClockButtons() {
         <button
           type="button"
           disabled={!canClockOut || isPending}
-          onClick={() => clockOutMutation.mutate()}
+          onClick={() => setMemoDialogType("clockOut")}
           className="flex flex-col items-center justify-center gap-2 rounded-xl bg-orange-500 py-8 text-white transition-colors hover:bg-orange-600 active:bg-orange-700 disabled:bg-gray-200 disabled:text-gray-400"
         >
           <LogOut className="h-8 w-8" />
           <span className="text-lg font-bold">退勤</span>
         </button>
       </div>
+      <MemoDialog
+        open={memoDialogType !== null}
+        title={memoDialogType === "clockIn" ? "出勤打刻" : "退勤打刻"}
+        onConfirm={handleMemoConfirm}
+        onCancel={() => setMemoDialogType(null)}
+      />
     </div>
   );
 }

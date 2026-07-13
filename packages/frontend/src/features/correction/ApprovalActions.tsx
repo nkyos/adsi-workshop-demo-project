@@ -48,20 +48,12 @@ export function ApprovalActions({ correctionId, version }: ApprovalActionsProps)
 
   return (
     <div className="flex gap-2">
-      <Button
-        size="sm"
-        onClick={handleApprove}
-        disabled={isPending}
-      >
+      <Button size="sm" onClick={handleApprove} disabled={isPending}>
         {approveMutation.isPending ? "承認中..." : "承認"}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger
-          render={
-            <Button size="sm" variant="destructive" disabled={isPending} />
-          }
-        >
+        <DialogTrigger render={<Button size="sm" variant="destructive" disabled={isPending} />}>
           却下
         </DialogTrigger>
         <DialogContent>
@@ -84,11 +76,7 @@ export function ApprovalActions({ correctionId, version }: ApprovalActionsProps)
               />
             </div>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 キャンセル
               </Button>
               <Button

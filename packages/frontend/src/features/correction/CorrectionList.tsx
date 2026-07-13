@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
 import { type Column, DataTable } from "@/components/DataTable";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,10 @@ import { formatDate, formatTime } from "@/features/attendance/format";
 import type { CorrectionResponse, CorrectionStatus } from "./correction-api";
 import { useCorrections } from "./useCorrections";
 
-const STATUS_CONFIG_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+const STATUS_CONFIG_MAP: Record<
+  string,
+  { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
+> = {
   PENDING: { label: "申請中", variant: "secondary" },
   APPROVED: { label: "承認済", variant: "default" },
   REJECTED: { label: "却下", variant: "destructive" },
@@ -49,25 +52,19 @@ const columns: Column<CorrectionResponse>[] = [
   {
     key: "reason",
     header: "理由",
-    render: (item) => (
-      <span className="max-w-[200px] truncate block">{item.reason}</span>
-    ),
+    render: (item) => <span className="max-w-[200px] truncate block">{item.reason}</span>,
   },
   {
     key: "status",
     header: "ステータス",
-    render: (item) => (
-      <StatusBadge status={item.status} configMap={STATUS_CONFIG_MAP} />
-    ),
+    render: (item) => <StatusBadge status={item.status} configMap={STATUS_CONFIG_MAP} />,
   },
   {
     key: "rejectReason",
     header: "却下理由",
     render: (item) =>
       item.rejectReason ? (
-        <span className="max-w-[200px] truncate block text-destructive">
-          {item.rejectReason}
-        </span>
+        <span className="max-w-[200px] truncate block text-destructive">{item.rejectReason}</span>
       ) : (
         "-"
       ),

@@ -4,9 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/Toast";
 import { useAuth } from "@/features/auth/useAuth";
 import {
+  approveCorrection,
   type CorrectionCreateRequest,
   type CorrectionStatus,
-  approveCorrection,
   createCorrection,
   fetchCorrections,
   fetchPendingCorrections,
@@ -32,8 +32,7 @@ export function useCreateCorrection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (request: CorrectionCreateRequest) =>
-      createCorrection(user!.id, request),
+    mutationFn: (request: CorrectionCreateRequest) => createCorrection(user!.id, request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CORRECTIONS_KEY });
       toast.success("修正申請を送信しました");
@@ -77,15 +76,8 @@ export function useRejectCorrection() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      reason,
-      version,
-    }: {
-      id: string;
-      reason: string;
-      version: number;
-    }) => rejectCorrection(id, user!.id, reason, version),
+    mutationFn: ({ id, reason, version }: { id: string; reason: string; version: number }) =>
+      rejectCorrection(id, user!.id, reason, version),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PENDING_KEY });
       queryClient.invalidateQueries({ queryKey: CORRECTIONS_KEY });
