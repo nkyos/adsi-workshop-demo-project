@@ -44,10 +44,7 @@ export function createCorrection(
   requesterId: string,
   request: CorrectionCreateRequest,
 ): Promise<CorrectionResponse> {
-  return apiClient.post<CorrectionResponse>(
-    `/api/corrections?requesterId=${requesterId}`,
-    request,
-  );
+  return apiClient.post<CorrectionResponse>(`/api/corrections?requesterId=${requesterId}`, request);
 }
 
 export function fetchCorrections(
@@ -61,9 +58,7 @@ export function fetchCorrections(
   return apiClient.get<CorrectionResponse[]>(`/api/corrections?${params.toString()}`);
 }
 
-export function fetchPendingCorrections(
-  managerId: string,
-): Promise<PendingCorrectionResponse[]> {
+export function fetchPendingCorrections(managerId: string): Promise<PendingCorrectionResponse[]> {
   return apiClient.get<PendingCorrectionResponse[]>(
     `/api/corrections/pending?managerId=${managerId}`,
   );

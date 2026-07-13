@@ -1,8 +1,8 @@
-import { ApiClientError } from "@/lib/api-client";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createElement } from "react";
-import { type Mock, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import { ApiClientError } from "@/lib/api-client";
 import { LoginForm } from "./LoginForm";
 import { useLogin } from "./useAuth";
 
@@ -56,7 +56,10 @@ describe("LoginForm", () => {
     const user = userEvent.setup();
 
     await user.type(view.getByPlaceholderText("example@company.com"), "test@example.com");
-    await user.type(container.querySelector('input[type="password"]') as HTMLElement, "password123");
+    await user.type(
+      container.querySelector('input[type="password"]') as HTMLElement,
+      "password123",
+    );
     await user.click(view.getByRole("button", { name: "ログイン" }));
 
     expect(mockMutate).toHaveBeenCalledWith({
@@ -83,9 +86,7 @@ describe("LoginForm", () => {
     const { container } = render(<LoginForm />);
     const view = within(container);
 
-    expect(
-      view.getByText("メールアドレスまたはパスワードが正しくありません"),
-    ).toBeInTheDocument();
+    expect(view.getByText("メールアドレスまたはパスワードが正しくありません")).toBeInTheDocument();
   });
 
   it("想定外のエラーの場合は汎用メッセージを表示する", () => {

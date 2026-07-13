@@ -52,11 +52,7 @@ export default function ReportsPage() {
         <ExportButtons month={selectedMonth} departmentId={filterDepartmentId} />
       </div>
 
-      {isLoading ? (
-        <div>読み込み中...</div>
-      ) : (
-        <MonthlyReportTable records={data?.records ?? []} />
-      )}
+      {isLoading ? <div>読み込み中...</div> : <MonthlyReportTable records={data?.records ?? []} />}
     </div>
   );
 }

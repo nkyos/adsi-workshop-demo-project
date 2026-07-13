@@ -23,21 +23,11 @@ export function ExportButtons({ month, departmentId }: ExportButtonsProps) {
 
   return (
     <div className="flex gap-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleCsv}
-        disabled={csvMutation.isPending}
-      >
+      <Button variant="outline" size="sm" onClick={handleCsv} disabled={csvMutation.isPending}>
         <Download className="mr-1 h-4 w-4" />
         {csvMutation.isPending ? "ダウンロード中..." : "CSV"}
       </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handlePdf}
-        disabled={pdfMutation.isPending}
-      >
+      <Button variant="outline" size="sm" onClick={handlePdf} disabled={pdfMutation.isPending}>
         <Download className="mr-1 h-4 w-4" />
         {pdfMutation.isPending ? "ダウンロード中..." : "PDF"}
       </Button>

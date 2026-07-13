@@ -1,7 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "@/components/Toast";
 import { downloadCsv, downloadPdf, fetchMonthlyReport } from "./report-api";
 

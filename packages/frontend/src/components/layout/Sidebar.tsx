@@ -1,6 +1,15 @@
 "use client";
 
-import { BarChart3, Building2, CheckSquare, Clock, FileEdit, History, LayoutDashboard, Users } from "lucide-react";
+import {
+  BarChart3,
+  Building2,
+  CheckSquare,
+  Clock,
+  FileEdit,
+  History,
+  LayoutDashboard,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -25,9 +34,7 @@ export function AppSidebar() {
     { title: "修正申請", href: "/corrections", icon: FileEdit },
   ];
 
-  const managerItems = [
-    { title: "承認", href: "/approvals", icon: CheckSquare },
-  ];
+  const managerItems = [{ title: "承認", href: "/approvals", icon: CheckSquare }];
 
   const adminItems = [
     { title: "社員管理", href: "/admin/employees", icon: Users },

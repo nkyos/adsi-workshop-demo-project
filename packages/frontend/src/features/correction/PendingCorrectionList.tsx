@@ -3,8 +3,8 @@
 import { type Column, DataTable } from "@/components/DataTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatTime } from "@/features/attendance/format";
-import type { PendingCorrectionResponse } from "./correction-api";
 import { ApprovalActions } from "./ApprovalActions";
+import type { PendingCorrectionResponse } from "./correction-api";
 import { usePendingCorrections } from "./useCorrections";
 
 const columns: Column<PendingCorrectionResponse>[] = [
@@ -30,16 +30,12 @@ const columns: Column<PendingCorrectionResponse>[] = [
   {
     key: "reason",
     header: "理由",
-    render: (item) => (
-      <span className="max-w-[200px] truncate block">{item.reason}</span>
-    ),
+    render: (item) => <span className="max-w-[200px] truncate block">{item.reason}</span>,
   },
   {
     key: "actions",
     header: "",
-    render: (item) => (
-      <ApprovalActions correctionId={item.id} version={item.version} />
-    ),
+    render: (item) => <ApprovalActions correctionId={item.id} version={item.version} />,
   },
 ];
 
@@ -56,12 +52,8 @@ export function PendingCorrectionList() {
         </div>
       ) : (
         <DataTable<PendingCorrectionResponse & Record<string, unknown>>
-          columns={
-            columns as Column<PendingCorrectionResponse & Record<string, unknown>>[]
-          }
-          data={
-            (data ?? []) as (PendingCorrectionResponse & Record<string, unknown>)[]
-          }
+          columns={columns as Column<PendingCorrectionResponse & Record<string, unknown>>[]}
+          data={(data ?? []) as (PendingCorrectionResponse & Record<string, unknown>)[]}
           rowKey={(item) => item.id}
           emptyMessage="承認待ちの修正申請はありません"
         />

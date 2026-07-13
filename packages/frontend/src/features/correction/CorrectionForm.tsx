@@ -1,7 +1,7 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { type FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,11 +94,7 @@ export function CorrectionForm() {
         <Button type="submit" disabled={!isValid || createMutation.isPending}>
           {createMutation.isPending ? "送信中..." : "申請する"}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/corrections")}
-        >
+        <Button type="button" variant="outline" onClick={() => router.push("/corrections")}>
           キャンセル
         </Button>
       </div>
