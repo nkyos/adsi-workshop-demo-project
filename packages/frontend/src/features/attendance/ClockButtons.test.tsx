@@ -35,7 +35,7 @@ function getClockInButton() {
 function getClockOutButton() {
   const buttons = screen.getAllByRole("button");
   const btn = buttons.find(
-    (b) => b.textContent?.includes("退勤") && !b.textContent?.includes("退勤済み")
+    (b) => b.textContent?.includes("退勤") && !b.textContent?.includes("退勤済み"),
   );
   if (!btn) throw new Error("退勤ボタンが見つかりません");
   return btn;
