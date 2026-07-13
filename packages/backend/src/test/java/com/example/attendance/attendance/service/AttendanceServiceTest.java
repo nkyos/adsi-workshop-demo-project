@@ -290,7 +290,7 @@ class AttendanceServiceTest {
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
             // Act
-            var result = service.updateMemo(recordId, "遅刻理由", "早退理由");
+            var result = service.updateMemo(recordId, employee.getId(), "遅刻理由", "早退理由");
 
             // Assert
             assertThat(result.clockInMemo()).isEqualTo("遅刻理由");
@@ -314,7 +314,7 @@ class AttendanceServiceTest {
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
             // Act
-            var result = service.updateMemo(recordId, "", null);
+            var result = service.updateMemo(recordId, employee.getId(), "", null);
 
             // Assert
             assertThat(result.clockInMemo()).isEmpty();
@@ -328,8 +328,31 @@ class AttendanceServiceTest {
             when(attendanceRepository.findById(recordId)).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThatThrownBy(() -> service.updateMemo(recordId, "memo", null))
+            assertThatThrownBy(() -> service.updateMemo(recordId, employee.getId(), "memo", null))
                     .isInstanceOf(EntityNotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("他人のレコードを編集すると403エラー")
+        void updateMemo_otherEmployee_throwsForbidden() {
+            // Arrange
+            var recordId = UUID.randomUUID();
+            var record = AttendanceRecord.builder()
+                    .id(recordId)
+                    .employee(employee)
+                    .workDate(TODAY_TOKYO)
+                    .clockIn(FIXED_INSTANT)
+                    .build();
+            when(attendanceRepository.findById(recordId)).thenReturn(Optional.of(record));
+
+            var otherEmployeeId = UUID.randomUUID();
+
+            // Act & Assert
+            assertThatThrownBy(() -> service.updateMemo(recordId, otherEmployeeId, "memo", null))
+                    .isInstanceOf(ResponseStatusException.class)
+                    .hasMessageContaining("Cannot edit another employee's memo");
+
+            verify(attendanceRepository, never()).save(any());
         }
     }
 

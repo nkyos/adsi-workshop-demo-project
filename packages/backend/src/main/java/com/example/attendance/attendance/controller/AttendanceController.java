@@ -8,8 +8,10 @@ import com.example.attendance.attendance.dto.TeamMemberSummaryResponse;
 import com.example.attendance.attendance.dto.TodayStatusResponse;
 import com.example.attendance.attendance.dto.UpdateMemoRequest;
 import com.example.attendance.attendance.service.AttendanceService;
+import com.example.attendance.common.config.security.EmployeeUserDetails;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,8 +49,9 @@ public class AttendanceController {
     @PutMapping("/{id}/memo")
     public AttendanceRecordResponse updateMemo(
             @PathVariable UUID id,
+            @AuthenticationPrincipal EmployeeUserDetails principal,
             @Valid @RequestBody UpdateMemoRequest request) {
-        return attendanceService.updateMemo(id, request.clockInMemo(), request.clockOutMemo());
+        return attendanceService.updateMemo(id, principal.getEmployeeId(), request.clockInMemo(), request.clockOutMemo());
     }
 
     @GetMapping("/today")

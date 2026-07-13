@@ -14,7 +14,7 @@ public interface AttendanceService {
 
     AttendanceRecordResponse clockOut(UUID employeeId, String memo);
 
-    AttendanceRecordResponse updateMemo(UUID recordId, String clockInMemo, String clockOutMemo);
+    AttendanceRecordResponse updateMemo(UUID recordId, UUID employeeId, String clockInMemo, String clockOutMemo);
 
     TodayStatusResponse getTodayStatus(UUID employeeId);
 

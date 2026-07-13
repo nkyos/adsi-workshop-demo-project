@@ -89,10 +89,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public AttendanceRecordResponse updateMemo(UUID recordId, String clockInMemo, String clockOutMemo) {
+    public AttendanceRecordResponse updateMemo(UUID recordId, UUID employeeId, String clockInMemo, String clockOutMemo) {
         var record = attendanceRepository.findById(recordId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "AttendanceRecord with id '%s' was not found".formatted(recordId)));
+
+        if (!record.getEmployee().getId().equals(employeeId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit another employee's memo");
+        }
 
         record.setClockInMemo(clockInMemo);
         record.setClockOutMemo(clockOutMemo);

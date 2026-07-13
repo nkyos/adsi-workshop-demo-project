@@ -346,6 +346,29 @@ class AttendanceIntegrationTest {
     }
 
     @Test
+    @DisplayName("他人のメモを編集すると403が返される")
+    void updateMemo_otherEmployee_returns403() throws Exception {
+        var clockInResult = mockMvc.perform(post("/api/attendance/clock-in")
+                .session(employeeSession)
+                .with(csrf())
+                .contentType(APPLICATION_JSON)
+                .content("{\"employeeId\":\"%s\"}".formatted(employeeId)))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        var responseBody = clockInResult.getResponse().getContentAsString();
+        var recordId = com.fasterxml.jackson.databind.json.JsonMapper.builder().build()
+                .readTree(responseBody).get("id").asText();
+
+        mockMvc.perform(put("/api/attendance/" + recordId + "/memo")
+                .session(managerSession)
+                .with(csrf())
+                .contentType(APPLICATION_JSON)
+                .content("{\"clockInMemo\":\"不正な編集\",\"clockOutMemo\":null}"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("未認証で出勤打刻すると401が返される")
     void clockIn_unauthenticated_returns401() throws Exception {
         mockMvc.perform(post("/api/attendance/clock-in")

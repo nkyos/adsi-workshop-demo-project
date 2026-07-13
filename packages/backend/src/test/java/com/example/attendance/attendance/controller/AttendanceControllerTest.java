@@ -9,6 +9,8 @@ import com.example.attendance.attendance.dto.TodayStatusResponse;
 import com.example.attendance.attendance.service.AttendanceService;
 import com.example.attendance.common.config.CorsConfig;
 import com.example.attendance.common.config.SecurityConfig;
+import com.example.attendance.common.config.security.EmployeeUserDetails;
+import com.example.attendance.employee.entity.Role;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -124,6 +128,50 @@ class AttendanceControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/attendance/clock-out メモ付きで200を返す")
+    void clockOut_withMemo_returns200() throws Exception {
+        // Arrange
+        var response = new AttendanceRecordResponse(
+                UUID.randomUUID(),
+                LocalDate.of(2025, 1, 15),
+                Instant.parse("2025-01-14T23:00:00Z"),
+                Instant.parse("2025-01-15T08:00:00Z"),
+                false,
+                null,
+                "早退:体調不良"
+        );
+        when(attendanceService.clockOut(EMPLOYEE_ID, "早退:体調不良")).thenReturn(response);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/attendance/clock-out")
+                        .contentType("application/json")
+                        .content("{\"employeeId\":\"" + EMPLOYEE_ID + "\",\"memo\":\"早退:体調不良\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clockOutMemo").value("早退:体調不良"));
+    }
+
+    @Test
+    @DisplayName("POST /api/attendance/clock-out メモ21文字で400エラー")
+    void clockOut_memoTooLong_returns400() throws Exception {
+        // Act & Assert
+        mockMvc.perform(post("/api/attendance/clock-out")
+                        .contentType("application/json")
+                        .content("{\"employeeId\":\"" + EMPLOYEE_ID + "\",\"memo\":\"123456789012345678901\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("PUT /api/attendance/{id}/memo メモ21文字で400エラー")
+    void updateMemo_memoTooLong_returns400() throws Exception {
+        // Act & Assert
+        var recordId = UUID.randomUUID();
+        mockMvc.perform(put("/api/attendance/" + recordId + "/memo")
+                        .contentType("application/json")
+                        .content("{\"clockInMemo\":\"123456789012345678901\",\"clockOutMemo\":null}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("POST /api/attendance/clock-out は200を返す")
     void clockOut_validRequest_returns200() throws Exception {
         // Arrange
@@ -160,10 +208,19 @@ class AttendanceControllerTest {
                 "遅刻理由",
                 "早退理由"
         );
-        when(attendanceService.updateMemo(recordId, "遅刻理由", "早退理由")).thenReturn(response);
+        when(attendanceService.updateMemo(eq(recordId), eq(EMPLOYEE_ID), eq("遅刻理由"), eq("早退理由")))
+                .thenReturn(response);
+
+        var principal = new EmployeeUserDetails(
+                "test@example.com", "password", true,
+                List.of(),
+                new EmployeeUserDetails.EmployeeInfo(
+                        EMPLOYEE_ID, "テスト社員", UUID.randomUUID(), "開発部", Role.EMPLOYEE, false)
+        );
 
         // Act & Assert
         mockMvc.perform(put("/api/attendance/" + recordId + "/memo")
+                        .with(user(principal))
                         .contentType("application/json")
                         .content("{\"clockInMemo\":\"遅刻理由\",\"clockOutMemo\":\"早退理由\"}"))
                 .andExpect(status().isOk())

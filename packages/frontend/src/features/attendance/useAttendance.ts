@@ -22,7 +22,7 @@ export function useTodayStatus() {
 
   return useQuery({
     queryKey: [...TODAY_STATUS_KEY, employeeId],
-    queryFn: () => fetchTodayStatus(employeeId!),
+    queryFn: () => fetchTodayStatus(employeeId as string),
     enabled: !!employeeId,
     refetchInterval: 60 * 1000,
   });
@@ -33,7 +33,10 @@ export function useClockIn() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (memo?: string) => clockIn(user!.id, memo),
+    mutationFn: (memo?: string) => {
+      if (!user) throw new Error("User not authenticated");
+      return clockIn(user.id, memo);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("出勤を記録しました");
@@ -46,7 +49,10 @@ export function useClockOut() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (memo?: string) => clockOut(user!.id, memo),
+    mutationFn: (memo?: string) => {
+      if (!user) throw new Error("User not authenticated");
+      return clockOut(user.id, memo);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TODAY_STATUS_KEY });
       toast.success("退勤を記録しました");
@@ -76,7 +82,7 @@ export function useAttendanceHistory(month: string) {
 
   return useQuery({
     queryKey: [...HISTORY_KEY, employeeId, month],
-    queryFn: () => fetchHistory(employeeId!, month),
+    queryFn: () => fetchHistory(employeeId as string, month),
     enabled: !!employeeId && !!month,
   });
 }
@@ -86,7 +92,7 @@ export function useTeamAttendance(month: string) {
 
   return useQuery({
     queryKey: [...TEAM_KEY, user?.id, month],
-    queryFn: () => fetchTeamAttendance(user!.id, month),
+    queryFn: () => fetchTeamAttendance(user?.id as string, month),
     enabled: !!user?.isManager && !!month,
   });
 }
