@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
   // trailing-slash リダイレクトを抑止して二重リダイレクトを避ける。
   ...(isSagemaker ? { skipTrailingSlashRedirect: true } : {}),
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.resolve(__dirname, "../.."),
   },
   ...(needsApiRewrite
     ? {
