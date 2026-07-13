@@ -50,7 +50,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public AttendanceRecordResponse clockIn(UUID employeeId) {
+    public AttendanceRecordResponse clockIn(UUID employeeId, String memo) {
         var employee = findEmployeeOrThrow(employeeId);
         var today = LocalDate.now(clock);
 
@@ -64,6 +64,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .employee(employee)
                 .workDate(today)
                 .clockIn(now)
+                .clockInMemo(memo)
                 .corrected(false)
                 .build();
 
@@ -74,14 +75,29 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     @Transactional
-    public AttendanceRecordResponse clockOut(UUID employeeId) {
+    public AttendanceRecordResponse clockOut(UUID employeeId, String memo) {
         var today = LocalDate.now(clock);
         var record = attendanceRepository.findByEmployeeIdAndWorkDateAndClockOutIsNull(employeeId, today)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "No active clock-in found"));
 
         record.setClockOut(Instant.now(clock));
+        record.setClockOutMemo(memo);
         var saved = attendanceRepository.save(record);
         log.info("Clock-out recorded for employee={} at={}", employeeId, saved.getClockOut());
+        return AttendanceRecordResponse.from(saved);
+    }
+
+    @Override
+    @Transactional
+    public AttendanceRecordResponse updateMemo(UUID recordId, String clockInMemo, String clockOutMemo) {
+        var record = attendanceRepository.findById(recordId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "AttendanceRecord with id '%s' was not found".formatted(recordId)));
+
+        record.setClockInMemo(clockInMemo);
+        record.setClockOutMemo(clockOutMemo);
+        var saved = attendanceRepository.save(record);
+        log.info("Memo updated for record={}", recordId);
         return AttendanceRecordResponse.from(saved);
     }
 
